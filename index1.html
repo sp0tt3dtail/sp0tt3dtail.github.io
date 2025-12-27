@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>System Update</title>
+<style>
+body, html {
+margin: 0;
+padding: 0;
+width: 100%;
+height: 100%;
+background-color: black;
+overflow: hidden;
+}
+
+/* The container for the YouTube API Player */
+#player {
+position: absolute;
+top: 0;
+left: 0;
+width: 100vw;
+height: 100vh;
+pointer-events: none; /* User cannot click the YouTube UI directly */
+}
+
+/* The Invisible Trap Layer */
+#click-trap {
+position: absolute;
+top: 0;
+left: 0;
+width: 100%;
+height: 100%;
+z-index: 9999;
+background: transparent;
+cursor: pointer;
+}
+</style>
+</head>
+<body>
+
+<div id="player"></div>
+
+<div id="click-trap"></div>
+
+<script>
+// 1. Load the YouTube IFrame Player API code asynchronously.
+var tag = document.createElement('script');
+tag.src = "https://www.youtube.com/iframe_api";
+var firstScriptTag = document.getElementsByTagName('script')[0];
+firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+
+// 2. Create the player object
+var player;
+function onYouTubeIframeAPIReady() {
+player = new YT.Player('player', {
+height: '100%',
+width: '100%',
+videoId: 'dQw4w9WgXcQ', // The Rick Roll ID
+playerVars: {
+'autoplay': 1,
+'controls': 0,
+'disablekb': 1,
+'fs': 0,
+'modestbranding': 1,
+'loop': 1,
+'playlist': 'dQw4w9WgXcQ', // Required for looping
+'playsinline': 1,
+'rel': 0,
+'mute': 1 // MUST start muted for autoplay to work on mobile
+},
+events: {
+'onReady': onPlayerReady
+}
+});
+}
+
+// 3. What to do when the video loads
+function onPlayerReady(event) {
+event.target.playVideo(); // Force play
+}
+
+// 4. The Trap Logic (Unmute + Fullscreen on Tap)
+document.getElementById('click-trap').addEventListener('click', function() {
+
+// A. Unmute and Max Volume
+if (player && player.unMute) {
+player.unMute();
+player.setVolume(100);
+}
+
+// B. Force Fullscreen
+var elem = document.documentElement;
+if (elem.requestFullscreen) {
+elem.requestFullscreen();
+} else if (elem.webkitRequestFullscreen) { /* Safari */
+elem.webkitRequestFullscreen();
+} else if (elem.msRequestFullscreen) { /* IE11 */
+elem.msRequestFullscreen();
+}
+});
+</script>
+</body>
+</html>
