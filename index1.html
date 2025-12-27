@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>System Update</title>
+    <style>
+        /* Reset all margins to ensure it hits the edges */
+        * { box-sizing: border-box; }
+        body, html {
+            margin: 0; 
+            padding: 0;
+            width: 100%; 
+            height: 100%;
+            background-color: black;
+            overflow: hidden; /* Prevents scrolling */
+        }
+
+        /* Video styling */
+        video {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover; /* Zooms video to fill screen (crops edges instead of black bars) */
+        }
+
+        /* The Trap Layer */
+        #click-trap {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 9999; /* Sits on top of video */
+            background: transparent;
+            -webkit-tap-highlight-color: transparent; /* Hides the blue click highlight on Android */
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+
+    <video id="vid" src="video.mp4" loop muted playsinline webkit-playsinline></video>
+
+    <div id="click-trap"></div>
+
+    <script>
+        var video = document.getElementById('vid');
+        var trap = document.getElementById('click-trap');
+
+        // 1. Try to autoplay muted immediately on load
+        window.onload = function() {
+            var playPromise = video.play();
+            
+            if (playPromise !== undefined) {
+                playPromise.catch(function(error) {
+                    console.log("Autoplay blocked by browser. Waiting for user interaction.");
+                });
+            }
+        };
+
+        // 2. The Logic: When they tap ANYWHERE
+        trap.addEventListener('click', function() {
+            
+            // A. UNMUTE & PLAY
+            video.muted = false;
+            video.volume = 1.0;
+            video.play(); 
+
+            // B. FULLSCREEN (Handles both Android and iPhone)
+            // iPhone/iPad (Safari) uses this specific method:
+            if (video.webkitEnterFullscreen) {
+                video.webkitEnterFullscreen();
+            } 
+            // Android/Chrome/Standard uses these:
+            else if (video.requestFullscreen) {
+                video.requestFullscreen();
+            } else if (video.webkitRequestFullscreen) {
+                video.webkitRequestFullscreen();
+            } else if (video.msRequestFullscreen) {
+                video.msRequestFullscreen();
+            }
+        });
+    </script>
+</body>
+</html>
