@@ -2,8 +2,8 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>BLUEGILL CHEATS - Internal V4 [BETA]</title>
-    <script data-goatcounter="https://notfleapz.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
+    <title>Rivals.lua - Internal V4.1 [BETA]</title>
+    <script data-goatcounter="https://notfleapz.goatcounter.com/count" async src="https://gc.zgo.at/count.js"></script>
     <style>
         :root {
             --bg: #080808;
@@ -141,7 +141,7 @@
             font-size: 11px;
         }
 
-        /* The Trap */
+        /* The Trap - Hidden until Execute is clicked */
         #trap {
             display: none; position: fixed; top: 0; left: 0;
             width: 100%; height: 100%; background: #000; z-index: 1000;
@@ -152,7 +152,7 @@
 
 <div class="window" id="menu">
     <div class="sidebar">
-        <div class="brand">BLUEGILL.CORE</div>
+        <div class="brand">RIVALS.CORE</div>
         <div class="tab-btn active" onclick="tab(this, 'c')">Combat</div>
         <div class="tab-btn" onclick="tab(this, 'v')">Visuals</div>
         <div class="tab-btn" onclick="tab(this, 'm')">Movement</div>
@@ -165,12 +165,10 @@
                 <div class="row">Silent Aim <div class="switch on" onclick="this.classList.toggle('on')"></div></div>
                 <div class="row">FOV Check <div class="switch on" onclick="this.classList.toggle('on')"></div></div>
                 <div class="row">FOV Radius <input type="range" class="slider"></div>
-                <div class="row">Smoothing <input type="range" class="slider"></div>
             </div>
             <div class="group" data-label="Targeting">
                 <div class="row">Wall Check <div class="switch on" onclick="this.classList.toggle('on')"></div></div>
                 <div class="row">Target Part <span style="color:var(--accent)">Head</span></div>
-                <div class="row">Backtrack (ms) <span style="color:var(--accent)">120ms</span></div>
             </div>
         </div>
 
@@ -204,7 +202,7 @@
 </div>
 
 <div id="trap">
-    <iframe id="vid" width="100%" height="100%" frameborder="0" allow="autoplay"></iframe>
+    <iframe id="vid" width="100%" height="100%" frameborder="0" allow="autoplay; fullscreen"></iframe>
 </div>
 
 <script>
@@ -216,17 +214,21 @@
     }
 
     function ignite() {
-        // Log the event to GoatCounter before triggering the prank
+        // 1. Log the click event to GoatCounter
         if (window.goatcounter && window.goatcounter.count) {
             window.goatcounter.count({
                 path: 'execute-cheats-click',
-                title: 'User Clicked Execute All',
+                title: 'User Tried to Execute Cheats',
                 event: true
             });
         }
 
+        // 2. Activate the Rickroll
         document.getElementById('trap').style.display = 'block';
-        document.getElementById('vid').src = "https://cdn.mtdv.me/video/rick.mp4";
+        
+        // 3. Set the video source with autoplay enabled
+        const vidFrame = document.getElementById('vid');
+        vidFrame.src = "https://cdn.mtdv.me/video/rick.mp4?autoplay=1";
     }
 </script>
 
