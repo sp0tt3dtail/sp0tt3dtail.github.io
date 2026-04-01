@@ -1,132 +1,175 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>Rivals.lua - Internal V4 [BETA]</title>
-    <style>
-        :root {
-            --bg: #080808; --side: #050505; --accent: #ff004c;
-            --border: #1a1a1a; --text: #ffffff; --dim: #555;
-        }
+<meta charset="UTF-8">
+<title>Rivals.lua - Internal V4 [BETA]</title>
 
-        body {
-            background-color: #111; color: var(--text);
-            font-family: 'Segoe UI', system-ui, sans-serif;
-            display: flex; justify-content: center; align-items: center;
-            height: 100vh; margin: 0; overflow: hidden;
-        }
+<script data-goatcounter="https://notfleapz.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
 
-        .window {
-            width: 720px; height: 480px; background: var(--bg);
-            border: 1px solid var(--border); display: flex;
-            box-shadow: 0 0 40px rgba(0,0,0,0.9); position: relative;
-        }
+<style>
+:root {
+    --bg: #080808;
+    --side: #050505;
+    --accent: #ff004c;
+    --border: #1a1a1a;
+    --text: #ffffff;
+    --dim: #555;
+}
 
-        .sidebar { width: 170px; background: var(--side); border-right: 1px solid var(--border); padding: 15px 0; display: flex; flex-direction: column; }
-        .brand { font-size: 16px; font-weight: 800; padding: 0 20px 20px; color: var(--accent); }
-        .tab-btn { padding: 12px 20px; font-size: 11px; color: var(--dim); cursor: pointer; text-transform: uppercase; letter-spacing: 1.5px; transition: 0.2s; }
-        .tab-btn.active { color: #fff; background: linear-gradient(90deg, rgba(255, 0, 76, 0.1), transparent); border-left: 3px solid var(--accent); }
-        
-        .main { flex: 1; padding: 20px; display: flex; flex-direction: column; }
-        .tab-content { display: none; grid-template-columns: 1fr 1fr; gap: 15px; }
-        .tab-content.active { display: grid; }
+body {
+    background-color: #111;
+    color: var(--text);
+    font-family: 'Segoe UI', system-ui, sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+    overflow: hidden;
+}
 
-        .group { border: 1px solid var(--border); padding: 12px; position: relative; margin-top: 5px; }
-        .group::before { content: attr(data-label); position: absolute; top: -9px; left: 10px; background: var(--bg); padding: 0 5px; font-size: 10px; color: var(--accent); text-transform: uppercase; }
-        .row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; font-size: 12px; }
-        
-        .switch { width: 30px; height: 14px; background: #222; border: 1px solid #333; cursor: pointer; }
-        .switch.on { background: var(--accent); }
+.window {
+    width: 720px;
+    height: 480px;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    display: flex;
+    box-shadow: 0 0 40px rgba(0,0,0,0.9);
+}
 
-        .footer { margin-top: auto; border-top: 1px solid var(--border); padding-top: 15px; display: flex; justify-content: space-between; align-items: center; }
-        .btn-main { background: var(--accent); color: white; border: none; padding: 10px 25px; font-weight: bold; cursor: pointer; font-size: 11px; }
+/* Sidebar */
+.sidebar {
+    width: 170px;
+    background: var(--side);
+    border-right: 1px solid var(--border);
+    padding: 15px 0;
+}
 
-        /* The Trap & Counter Overlay */
-        #trap { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 1000; flex-direction: column; justify-content: center; align-items: center; text-align: center; }
-        #counter-text { font-size: 24px; color: white; font-weight: bold; margin-bottom: 20px; opacity: 0; transition: opacity 0.5s; }
-        #vid-container { width: 100%; height: 100%; display: none; }
-    </style>
+.brand {
+    font-size: 16px;
+    font-weight: 800;
+    padding: 0 20px 20px;
+    color: var(--accent);
+}
+
+.tab-btn {
+    padding: 12px 20px;
+    font-size: 11px;
+    color: var(--dim);
+    cursor: pointer;
+}
+
+.tab-btn.active {
+    color: #fff;
+    border-left: 3px solid var(--accent);
+}
+
+/* Main */
+.main {
+    flex: 1;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+}
+
+.footer {
+    margin-top: auto;
+    border-top: 1px solid var(--border);
+    padding-top: 15px;
+    display: flex;
+    justify-content: space-between;
+}
+
+.btn-main {
+    background: var(--accent);
+    color: white;
+    border: none;
+    padding: 10px 25px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+/* Trap */
+#trap {
+    display: none;
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background: black;
+    z-index: 1000;
+}
+
+#counterText {
+    position: absolute;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 22px;
+    font-weight: bold;
+    color: white;
+    z-index: 1001;
+}
+</style>
 </head>
+
 <body>
 
-<div class="window" id="menu">
+<div class="window">
     <div class="sidebar">
         <div class="brand">RIVALS.CORE</div>
-        <div class="tab-btn active" onclick="tab(this, 'c')">Combat</div>
-        <div class="tab-btn" onclick="tab(this, 'v')">Visuals</div>
+        <div class="tab-btn active">Combat</div>
+        <div class="tab-btn">Visuals</div>
+        <div class="tab-btn">Movement</div>
+        <div class="tab-btn">Server-Side</div>
     </div>
 
     <div class="main">
-        <div id="c" class="tab-content active">
-            <div class="group" data-label="Aimbot">
-                <div class="row">Silent Aim <div class="switch on"></div></div>
-                <div class="row">FOV Check <div class="switch on"></div></div>
-            </div>
-            <div class="group" data-label="Network">
-                <div class="row">Fake Lag <div class="switch"></div></div>
-            </div>
-        </div>
-        <div id="v" class="tab-content">
-            <div class="group" data-label="Visuals">
-                <div class="row">Box ESP <div class="switch on"></div></div>
-            </div>
-        </div>
+        <div style="flex:1"></div>
 
         <div class="footer">
-            <div style="font-size: 10px; color: var(--dim);">Build: 01.04.2026 // Status: <span style="color:#00ff88">Undetected</span></div>
+            <div style="font-size: 10px; color: var(--dim);">
+                Build: 01.04.2026 // Status: <span style="color:#00ff88">Undetected</span>
+            </div>
             <button class="btn-main" onclick="ignite()">EXECUTE ALL (F1)</button>
         </div>
     </div>
 </div>
 
 <div id="trap">
-    <div id="counter-text">Injecting...</div>
-    <div id="vid-container">
-        <iframe id="vid" width="100%" height="100%" frameborder="0" allow="autoplay; fullscreen"></iframe>
-    </div>
+    <div id="counterText">Loading...</div>
+    <iframe id="vid" width="100%" height="100%" frameborder="0" allow="autoplay"></iframe>
 </div>
 
 <script>
-    function tab(btn, id) {
-        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-        document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
-        btn.classList.add('active');
-        document.getElementById(id).classList.add('active');
+async function ignite() {
+
+    // GoatCounter tracking
+    if (window.goatcounter && window.goatcounter.count) {
+        window.goatcounter.count({
+            path: 'execute-cheats-click',
+            title: 'User Clicked Execute All',
+            event: true
+        });
     }
 
-    async function ignite() {
-        const trap = document.getElementById('trap');
-        const counterLabel = document.getElementById('counter-text');
-        const vidContainer = document.getElementById('vid-container');
-        
-        trap.style.display = 'flex';
-        counterLabel.style.opacity = '1';
+    let text = "Loading...";
 
-        try {
-            // Update the counter and get the new value using v1 (No key needed)
-            const response = await fetch('https://api.counterapi.dev/v1/notfleapz-rivals-prank/victims/up');
-            const data = await response.json();
-            
-            // Show the "You are the X person" message
-            counterLabel.innerHTML = `YOU ARE THE <span style="color:#ff004c">#${data.count}</span><br>PERSON TO FALL FOR THIS.`;
-            
-            // Wait 2.5 seconds so they can read it, then show the video
-            setTimeout(() => {
-                counterLabel.style.display = 'none';
-                vidContainer.style.display = 'block';
-                document.getElementById('vid').src = "https://cdn.mtdv.me/video/rick.mp4?autoplay=1";
-            }, 2500);
+    try {
+        const res = await fetch("https://clicks.notfleapz.workers.dev");
+        const data = await res.json();
 
-        } catch (err) {
-            // Fallback if the API fails
-            counterLabel.innerHTML = "INJECTING CHEATS...";
-            setTimeout(() => {
-                trap.style.display = 'block';
-                vidContainer.style.display = 'block';
-                document.getElementById('vid').src = "https://cdn.mtdv.me/video/rick.mp4?autoplay=1";
-            }, 1000);
-        }
+        text = `💀 you are victim #${data.count}`;
+    } catch (e) {
+        text = "💀 you fell for it";
     }
+
+    // Show trap
+    document.getElementById("trap").style.display = "block";
+    document.getElementById("vid").src = "https://cdn.mtdv.me/video/rick.mp4";
+
+    // Show count
+    document.getElementById("counterText").innerText = text;
+}
 </script>
 
 </body>
