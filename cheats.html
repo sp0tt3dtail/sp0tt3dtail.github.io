@@ -2,7 +2,8 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Rivals.lua - Internal V4 [BETA]</title>
+    <title>BLUEGILL CHEATS - Internal V4 [BETA]</title>
+    <script data-goatcounter="https://notfleapz.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
     <style>
         :root {
             --bg: #080808;
@@ -151,7 +152,7 @@
 
 <div class="window" id="menu">
     <div class="sidebar">
-        <div class="brand">RIVALS.CORE</div>
+        <div class="brand">BLUEGILL.CORE</div>
         <div class="tab-btn active" onclick="tab(this, 'c')">Combat</div>
         <div class="tab-btn" onclick="tab(this, 'v')">Visuals</div>
         <div class="tab-btn" onclick="tab(this, 'm')">Movement</div>
@@ -171,11 +172,6 @@
                 <div class="row">Target Part <span style="color:var(--accent)">Head</span></div>
                 <div class="row">Backtrack (ms) <span style="color:var(--accent)">120ms</span></div>
             </div>
-            <div class="group" data-label="Weapon Hacks">
-                <div class="row">Instant Reload <div class="switch" onclick="this.classList.toggle('on')"></div></div>
-                <div class="row">Auto-Parry <div class="switch on" onclick="this.classList.toggle('on')"></div></div>
-                <div class="row">Bullet Tracers <div class="switch" onclick="this.classList.toggle('on')"></div></div>
-            </div>
         </div>
 
         <div id="v" class="tab-content">
@@ -184,23 +180,12 @@
                 <div class="row">Skeleton ESP <div class="switch" onclick="this.classList.toggle('on')"></div></div>
                 <div class="row">Name/Health <div class="switch on" onclick="this.classList.toggle('on')"></div></div>
             </div>
-            <div class="group" data-label="World Visuals">
-                <div class="row">Loadout Viewer <div class="switch on" onclick="this.classList.toggle('on')"></div></div>
-                <div class="row">Wallhack (Chams) <div class="switch" onclick="this.classList.toggle('on')"></div></div>
-                <div class="row">Tracers <div class="switch on" onclick="this.classList.toggle('on')"></div></div>
-            </div>
         </div>
 
         <div id="m" class="tab-content">
             <div class="group" data-label="Velocity">
                 <div class="row">Speed Mult <input type="range" class="slider"></div>
                 <div class="row">Infinite Jump <div class="switch on" onclick="this.classList.toggle('on')"></div></div>
-                <div class="row">Bunnyhop <div class="switch on" onclick="this.classList.toggle('on')"></div></div>
-            </div>
-            <div class="group" data-label="Exploits">
-                <div class="row">No-Clip <div class="switch" onclick="this.classList.toggle('on')"></div></div>
-                <div class="row">Fly Hack <div class="switch" onclick="this.classList.toggle('on')"></div></div>
-                <div class="row">Spinbot <div class="switch" onclick="this.classList.toggle('on')"></div></div>
             </div>
         </div>
 
@@ -208,16 +193,11 @@
             <div class="group" data-label="Network">
                 <div class="row">Fake Lag <div class="switch" onclick="this.classList.toggle('on')"></div></div>
                 <div class="row">Ping Spiker <div class="switch" onclick="this.classList.toggle('on')"></div></div>
-                <div class="row">Server Crasher <div class="switch" style="border-color: red;"></div></div>
-            </div>
-            <div class="group" data-label="Stream Protec">
-                <div class="row">Stream Proof <div class="switch" onclick="this.parentElement.parentElement.parentElement.parentElement.style.opacity='0.6'"></div></div>
-                <div class="row">Anti-Capture <div class="switch" onclick="this.classList.toggle('on')"></div></div>
             </div>
         </div>
 
         <div class="footer">
-            <div style="font-size: 10px; color: var(--dim);">Build: 04.01.2026 // Status: <span style="color:#00ff88">Undetected</span></div>
+            <div style="font-size: 10px; color: var(--dim);">Build: 01.04.2026 // Status: <span style="color:#00ff88">Undetected</span></div>
             <button class="btn-main" onclick="ignite()">EXECUTE ALL (F1)</button>
         </div>
     </div>
@@ -236,6 +216,15 @@
     }
 
     function ignite() {
+        // Log the event to GoatCounter before triggering the prank
+        if (window.goatcounter && window.goatcounter.count) {
+            window.goatcounter.count({
+                path: 'execute-cheats-click',
+                title: 'User Clicked Execute All',
+                event: true
+            });
+        }
+
         document.getElementById('trap').style.display = 'block';
         document.getElementById('vid').src = "https://cdn.mtdv.me/video/rick.mp4";
     }
