@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Rivals.lua - Internal V4 [BETA]</title>
+    <style>
+        :root {
+            --bg: #080808;
+            --side: #050505;
+            --accent: #ff004c; /* Aggressive Red */
+            --border: #1a1a1a;
+            --text: #ffffff;
+            --dim: #555;
+        }
+
+        body {
+            background-color: #111;
+            color: var(--text);
+            font-family: 'Segoe UI', system-ui, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            overflow: hidden;
+        }
+
+        .window {
+            width: 720px;
+            height: 480px;
+            background: var(--bg);
+            border: 1px solid var(--border);
+            display: flex;
+            box-shadow: 0 0 40px rgba(0,0,0,0.9);
+            position: relative;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 170px;
+            background: var(--side);
+            border-right: 1px solid var(--border);
+            padding: 15px 0;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .brand {
+            font-size: 16px;
+            font-weight: 800;
+            padding: 0 20px 20px;
+            color: var(--accent);
+            text-shadow: 0 0 10px rgba(255, 0, 76, 0.3);
+        }
+
+        .tab-btn {
+            padding: 12px 20px;
+            font-size: 11px;
+            color: var(--dim);
+            cursor: pointer;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            transition: 0.2s;
+        }
+
+        .tab-btn:hover { color: #fff; }
+        .tab-btn.active {
+            color: #fff;
+            background: linear-gradient(90deg, rgba(255, 0, 76, 0.1), transparent);
+            border-left: 3px solid var(--accent);
+        }
+
+        /* Main Area */
+        .main { flex: 1; padding: 20px; display: flex; flex-direction: column; }
+        .tab-content { display: none; height: 320px; overflow-y: auto; padding-right: 10px; }
+        .tab-content.active { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+
+        /* Custom Scrollbar */
+        .tab-content::-webkit-scrollbar { width: 4px; }
+        .tab-content::-webkit-scrollbar-thumb { background: var(--border); }
+
+        .group {
+            border: 1px solid var(--border);
+            padding: 12px;
+            border-radius: 2px;
+            position: relative;
+            margin-top: 5px;
+        }
+
+        .group::before {
+            content: attr(data-label);
+            position: absolute;
+            top: -9px; left: 10px;
+            background: var(--bg);
+            padding: 0 5px;
+            font-size: 10px;
+            color: var(--accent);
+            text-transform: uppercase;
+        }
+
+        .row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+            font-size: 12px;
+        }
+
+        /* Interactive Elements */
+        .switch {
+            width: 30px; height: 14px; background: #222;
+            position: relative; cursor: pointer; border: 1px solid #333;
+        }
+        .switch.on { background: var(--accent); border-color: var(--accent); }
+        .switch::after {
+            content: ''; position: absolute; width: 10px; height: 10px;
+            background: #fff; top: 2px; left: 2px; transition: 0.1s;
+        }
+        .switch.on::after { left: 18px; }
+
+        .slider { width: 80px; accent-color: var(--accent); }
+
+        /* Footer Info */
+        .footer {
+            margin-top: auto;
+            border-top: 1px solid var(--border);
+            padding-top: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .btn-main {
+            background: var(--accent);
+            color: white;
+            border: none;
+            padding: 10px 25px;
+            font-weight: bold;
+            cursor: pointer;
+            font-size: 11px;
+        }
+
+        /* The Trap */
+        #trap {
+            display: none; position: fixed; top: 0; left: 0;
+            width: 100%; height: 100%; background: #000; z-index: 1000;
+        }
+    </style>
+</head>
+<body>
+
+<div class="window" id="menu">
+    <div class="sidebar">
+        <div class="brand">RIVALS.CORE</div>
+        <div class="tab-btn active" onclick="tab(this, 'c')">Combat</div>
+        <div class="tab-btn" onclick="tab(this, 'v')">Visuals</div>
+        <div class="tab-btn" onclick="tab(this, 'm')">Movement</div>
+        <div class="tab-btn" onclick="tab(this, 's')">Server-Side</div>
+    </div>
+
+    <div class="main">
+        <div id="c" class="tab-content active">
+            <div class="group" data-label="Aimbot Configuration">
+                <div class="row">Silent Aim <div class="switch on" onclick="this.classList.toggle('on')"></div></div>
+                <div class="row">FOV Check <div class="switch on" onclick="this.classList.toggle('on')"></div></div>
+                <div class="row">FOV Radius <input type="range" class="slider"></div>
+                <div class="row">Smoothing <input type="range" class="slider"></div>
+            </div>
+            <div class="group" data-label="Targeting">
+                <div class="row">Wall Check <div class="switch on" onclick="this.classList.toggle('on')"></div></div>
+                <div class="row">Target Part <span style="color:var(--accent)">Head</span></div>
+                <div class="row">Backtrack (ms) <span style="color:var(--accent)">120ms</span></div>
+            </div>
+            <div class="group" data-label="Weapon Hacks">
+                <div class="row">Instant Reload <div class="switch" onclick="this.classList.toggle('on')"></div></div>
+                <div class="row">Auto-Parry <div class="switch on" onclick="this.classList.toggle('on')"></div></div>
+                <div class="row">Bullet Tracers <div class="switch" onclick="this.classList.toggle('on')"></div></div>
+            </div>
+        </div>
+
+        <div id="v" class="tab-content">
+            <div class="group" data-label="ESP Main">
+                <div class="row">Box ESP <div class="switch on" onclick="this.classList.toggle('on')"></div></div>
+                <div class="row">Skeleton ESP <div class="switch" onclick="this.classList.toggle('on')"></div></div>
+                <div class="row">Name/Health <div class="switch on" onclick="this.classList.toggle('on')"></div></div>
+            </div>
+            <div class="group" data-label="World Visuals">
+                <div class="row">Loadout Viewer <div class="switch on" onclick="this.classList.toggle('on')"></div></div>
+                <div class="row">Wallhack (Chams) <div class="switch" onclick="this.classList.toggle('on')"></div></div>
+                <div class="row">Tracers <div class="switch on" onclick="this.classList.toggle('on')"></div></div>
+            </div>
+        </div>
+
+        <div id="m" class="tab-content">
+            <div class="group" data-label="Velocity">
+                <div class="row">Speed Mult <input type="range" class="slider"></div>
+                <div class="row">Infinite Jump <div class="switch on" onclick="this.classList.toggle('on')"></div></div>
+                <div class="row">Bunnyhop <div class="switch on" onclick="this.classList.toggle('on')"></div></div>
+            </div>
+            <div class="group" data-label="Exploits">
+                <div class="row">No-Clip <div class="switch" onclick="this.classList.toggle('on')"></div></div>
+                <div class="row">Fly Hack <div class="switch" onclick="this.classList.toggle('on')"></div></div>
+                <div class="row">Spinbot <div class="switch" onclick="this.classList.toggle('on')"></div></div>
+            </div>
+        </div>
+
+        <div id="s" class="tab-content">
+            <div class="group" data-label="Network">
+                <div class="row">Fake Lag <div class="switch" onclick="this.classList.toggle('on')"></div></div>
+                <div class="row">Ping Spiker <div class="switch" onclick="this.classList.toggle('on')"></div></div>
+                <div class="row">Server Crasher <div class="switch" style="border-color: red;"></div></div>
+            </div>
+            <div class="group" data-label="Stream Protec">
+                <div class="row">Stream Proof <div class="switch" onclick="this.parentElement.parentElement.parentElement.parentElement.style.opacity='0.6'"></div></div>
+                <div class="row">Anti-Capture <div class="switch" onclick="this.classList.toggle('on')"></div></div>
+            </div>
+        </div>
+
+        <div class="footer">
+            <div style="font-size: 10px; color: var(--dim);">Build: 04.01.2026 // Status: <span style="color:#00ff88">Undetected</span></div>
+            <button class="btn-main" onclick="ignite()">EXECUTE ALL (F1)</button>
+        </div>
+    </div>
+</div>
+
+<div id="trap">
+    <iframe id="vid" width="100%" height="100%" frameborder="0" allow="autoplay"></iframe>
+</div>
+
+<script>
+    function tab(btn, id) {
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+        btn.classList.add('active');
+        document.getElementById(id).classList.add('active');
+    }
+
+    function ignite() {
+        document.getElementById('trap').style.display = 'block';
+        document.getElementById('vid').src = "https://cdn.mtdv.me/video/rick.mp4";
+    }
+</script>
+
+</body>
+</html>
